@@ -14,6 +14,7 @@ add_executable(
     Interpretator.cpp
     "LAD_AP v.2.0.0.cpp"
     Reciever.cpp
+    CommandIO.cpp
 )
 
 

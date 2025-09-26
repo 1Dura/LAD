@@ -2,7 +2,7 @@
 #include <vector>
 #include <gtest/gtest.h>
 #include <iostream>
-#include "../token_converter.h"
+#include "token_converter.h"
 
 
 using namespace std;

@@ -4,12 +4,11 @@ project(LAD_APP)
 option(BUILD_TESTS "Build tests" ON)
 
 add_library(lad_lib STATIC
-    src/Commands.cpp
+    src/CommandIO.cpp
     src/Helpers.cpp
     src/Interpretator.cpp
     src/Reciever.cpp
     include/CommandIO.h
-    include/Commands.h
     include/Helpers.h
     include/Interpretator.h
     include/Reciever.h

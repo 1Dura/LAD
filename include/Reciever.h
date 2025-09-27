@@ -2,11 +2,16 @@
 
 #include <string>
 #include <vector>
+#include <regex>
+
 using namespace std;
 
 
 
-class Reciever // интерфейс
+
+
+
+class Reciever // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 {
 public:
 	Reciever() = default;
@@ -44,7 +49,7 @@ public:
 
 
 
-class Remote : public Reciever // реализатор всех инструкций
+class Remote : public Reciever // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 {
 	string** grid;
 	int current_instruction;
@@ -61,14 +66,15 @@ public:
 		delete registers;
 		delete registers_f;
 	}
-	//вспомогательные
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	int digit_getter(string s);
 	int jmp_address_detection(string token);
 	int* getRegisters();
 	int& getCurrInst();
+	int ld_st_address_converter(string s);
 
 
-	//арифметические
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	virtual void ADD();
 	virtual void FADD();
 	virtual void SUB();
@@ -80,17 +86,17 @@ public:
 	virtual void INC();
 	virtual void DEC();
 
-	//побитовые операции
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	virtual void AND();
 	virtual void OR();
 	virtual void NOT();
 	virtual void XOR();
 
-	//вроде логические сдивиги
+	//пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	virtual void SHR();
 	virtual void SHL();
 
-	//конструкции для if while
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ if while
 	virtual void CMP();
 	virtual void JMP();
 	virtual void JE();
@@ -100,11 +106,11 @@ public:
 	virtual void JG();
 	virtual void JGE();
 	
-	//работа с памятью
+	//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	virtual void LD();
 	virtual void ST();
 	virtual void MOV();
 
-	//конечная
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	virtual void NOP();
 };

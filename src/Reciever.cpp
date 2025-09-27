@@ -1,8 +1,19 @@
 #include "Reciever.h"
+#include "Helpers.h"
+
+
+
+regex pattern_reg_reg("\\[\\s*[Rr](0|[1-9]|[1-2][0-9]|3[0-2])\\s*(\\+|\\-)\\s*[Rr](0|[1-9]|[1-2][0-9]|3[0-2])\\s*\\]");
+regex pattern_const_reg("\\[\\s*(\\d+)\\s*(\\+|\\-)\\s*[Rr](0|[1-9]|[1-2][0-9]|3[0-2])\\s*\\]");
+regex pattern_reg_const("\\[\\s*[Rr](0|[1-9]|[1-2][0-9]|3[0-2])\\s*(\\+|\\-)\\s*(\\d+)\\s*\\]");
+regex pattern_const("\\[\\s*(\\d+)\\s*\\]");
+regex pattern_reg("\\[\\s*[Rr](0|[1-9]|[1-2][0-9]|3[0-2])\\s*\\]");
+smatch matches;
+
 
 #define REG(x) registers[digit_getter(grid[current_instruction][x])]
 #define REGF(x) registers_f[digit_getter(grid[current_instruction][x])]
-#define MEM(x) memory[(digit_getter(grid[current_instruction][x])-1000)/4]
+#define MEM(x) memory[(ld_st_address_converter(grid[current_instruction][x])-1000)/4]
 
 
 
@@ -32,16 +43,51 @@ int Remote::jmp_address_detection(string token)
 	int res;
 	switch (token[1])
 	{
-	case'+':
+	case '+':
 		res = 1;
 		break;
-	case'-':
+	case '-':
 		res =  -1;
 		break;
 	default:
 		res = 0;
 		break;
 	}
+	return res;
+}
+
+int Remote::ld_st_address_converter(string s)
+{
+	int res;
+	int i = 0;
+	if (regex_search(s, matches, pattern_reg_reg))
+	{
+		i = matches[2] == '+' ? 1 : -1;
+		res = registers[stoi(matches[1].str())] + i*registers[stoi(matches[3].str())];
+	}
+	else if (regex_search(s, matches, pattern_const_reg))
+	{
+		i = matches[2] == '+' ? 1 : -1;
+		res = stoi(matches[1].str()) + i*registers[stoi(matches[3].str())];
+	}
+	else if (regex_search(s, matches, pattern_reg_const))
+	{
+		i = matches[2] == '+' ? 1 : -1;
+		res = registers[stoi(matches[1].str())] + i*stoi(matches[3].str());
+	}
+	else if (regex_search(s, matches, pattern_const))
+	{
+		res = stoi(matches[1].str());
+	}
+	else if (regex_search(s, matches, pattern_reg))
+	{
+		res = registers[stoi(matches[1].str())];
+	}
+	else
+	{
+		throw - 1;
+	}
+	address_checker(res);
 	return res;
 }
 
@@ -89,14 +135,14 @@ void Remote::DIV()
 {
 	int r1 = REG(1);
 	int r2 = REG(2);
-	if (r2 == 0) return; // для защиты от аболтусов
+	if (r2 == 0) return; // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	REG(3) = REG(1) / REG(2);
 	REG(4) = REG(1) % REG(2);
 }
 
 void Remote::FDIV()
 {
-	if (REGF(2) == 0) return; // для защиты от аболтусов
+	if (REGF(2) == 0) return; // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	REGF(3) = REGF(1) / REGF(2);
 }
 
@@ -129,8 +175,8 @@ void Remote::SHR()
 
 void Remote::SHL()
 {
-	// заполняем нулями справа. сдвигаем R1 на R2, записываем в R3
-	// использую if для защиты от UBR
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ R1 пїЅпїЅ R2, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ R3
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ if пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ UBR
 	if ((REG(2) >= (sizeof(int) * 8)) || (REG(2) < 0)) return;
 	REG(3) = REG(1) << REG(2);
 
@@ -141,7 +187,7 @@ void Remote::CMP()
 	if (REG(1) == REG(2)) {
 		this->flag = 0;
 	}
-	else if (REG(1) <= REG(2)) { // начиная с этого условия и ниже flag попадает также под JNE
+	else if (REG(1) <= REG(2)) { // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ flag пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ JNE
 		this->flag = -2;
 	}
 	else if (REG(1) < REG(2)) {
@@ -166,7 +212,7 @@ void Remote::DEC()
 }
 
 void Remote::JMP() {
-	// Поскольку переход безусловный, мы передаём абсолютное значение указателя на инструкцию
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	auto p = grid[current_instruction][1];
 	if (jmp_address_detection(p) != 0) return;
 	int addr = digit_getter(p);
@@ -184,7 +230,7 @@ void Remote::JE() {
 void Remote::JNE() {
 	auto p = grid[current_instruction][1];
 	if (jmp_address_detection(p) == 0) return;
-	if (this->flag == 0) return; // нужно узнать как ведёт себя jne при пустом флаге
+	if (this->flag == 0) return; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ jne пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	int addr = digit_getter(p) * jmp_address_detection(p);
 	this->current_instruction = (this->current_instruction + (addr / 4));
 }
@@ -223,7 +269,7 @@ void Remote::JGE() {
 
 void Remote::LD()
 {
-	// проверить первую букву регистра
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	if (grid[current_instruction][2][0] == 'r')
 	{
 		REG(2) = MEM(1);

@@ -1,5 +1,15 @@
 #include"Helpers.h"
 
+
+void address_checker(int num)
+{
+	if ((num - 1000) < 0)
+		throw 0;
+	if (num % 4 != 0)
+		throw 1;
+	// нужн проверка на существование в памяти
+}
+
 double digit_getter_f(string s)
 {
 	string res = "";

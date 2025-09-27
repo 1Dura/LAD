@@ -63,6 +63,6 @@ int main()
 	//все они очень слабо зависят друг от друга и очень легко заменяемы, также крайне удобно дебажить
 
 
-	Interpretator* inter = new Interpretator(grid, memory);
+	Interpretator* inter = new Interpretator(3,grid, memory);
 	inter->Interpretate();
 }

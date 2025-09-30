@@ -53,6 +53,7 @@ target_link_libraries(LAD_APP PRIVATE
                         ixwebsocket
                         nlohmann_json)
 
+### Переключайте переменную BUILD_TESTS на OFF, если не нужно собирать тесты ###
 if(BUILD_TESTS)
     include(FetchContent)
     

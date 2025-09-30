@@ -14,6 +14,7 @@ class ThreadSafeQueue {
 private:
     std::queue<T> q_;
     mutable std::mutex mtx_;
+    size_t size_;
 public:
     ThreadSafeQueue() = default;
 
@@ -36,6 +37,11 @@ public:
         q_.pop();
         return el;
     }
+
+    size_t size() {
+        std::lock_guard<std::mutex> lock(mtx_);
+        return q_.size();    
+    }
 };
 
 
@@ -43,14 +49,16 @@ class JsonTransporter {
 private:
     ThreadSafeQueue<json>& tsq_;
     int server_port_;
-    std::string server_host_ = "0.0.0.0";
+    std::string server_host_;
     std::unique_ptr<ix::WebSocketServer> srv_;
 
     void set_message_callback(std::shared_ptr<ix::WebSocket> srv);
     void set_connection_callback();
 public:
-    JsonTransporter(ThreadSafeQueue<json>& tsq,
-                    int server_port): tsq_(tsq), server_port_(server_port) {}
+    JsonTransporter(ThreadSafeQueue<json>& tsq, std::string server_host,
+                    int server_port): tsq_(tsq), 
+                    server_host_(server_host),
+                    server_port_(server_port) {}
     void start_server();
     void stop_server();
 };

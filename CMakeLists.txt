@@ -18,8 +18,8 @@ FetchContent_Declare(
   GIT_TAG v3.11.3
 )
 
-set(USE_TLS OFF CACHE BOOL "" FORCE) # иногда IxWebSocket хочет OpenSSL
-set(USE_ZLIB ON CACHE BOOL "" FORCE) # явно говорим, что хотим zlib
+set(USE_TLS OFF CACHE BOOL "" FORCE)
+set(USE_ZLIB ON CACHE BOOL "" FORCE)
 set(ZLIB_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/external/zlib" CACHE PATH "" FORCE)
 set(ZLIB_LIBRARY zlibstatic CACHE STRING "" FORCE)
 set(ZLIB_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/zlib" CACHE PATH "" FORCE)

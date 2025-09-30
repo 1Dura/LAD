@@ -1,20 +1,11 @@
-cmake_minimum_required(VERSION 4.0.1)
+cmake_minimum_required(VERSION 3.20)
 project(LAD_APP)
 
 option(BUILD_TESTS "Build tests" ON)
 
+add_subdirectory(external)
+
 ### Здесь загрузка библиотек с гита, трогать не рекомендую ###
-include(FetchContent)
-FetchContent_Declare(
-    zlib
-    GIT_REPOSITORY "https://github.com/madler/zlib.git"
-    GIT_TAG v1.3
-)
-FetchContent_MakeAvailable(zlib)
-
-set(ZLIB_INCLUDE_DIR ${zlib_SOURCE_DIR}/)
-set(ZLIB_LIBRARY ZLIB::ZLIB)
-
 include(FetchContent)
 FetchContent_Declare(
     ixwebsocket
@@ -26,8 +17,17 @@ FetchContent_Declare(
   GIT_REPOSITORY "https://github.com/nlohmann/json.git"
   GIT_TAG v3.11.3
 )
+
+set(USE_TLS OFF CACHE BOOL "" FORCE) # иногда IxWebSocket хочет OpenSSL
+set(USE_ZLIB ON CACHE BOOL "" FORCE) # явно говорим, что хотим zlib
+set(ZLIB_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/external/zlib" CACHE PATH "" FORCE)
+set(ZLIB_LIBRARY zlibstatic CACHE STRING "" FORCE)
+set(ZLIB_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/zlib" CACHE PATH "" FORCE)
+
 FetchContent_MakeAvailable(ixwebsocket nlohmann_json)
 ### --------------------------------------------------------###
+
+target_link_libraries(ixwebsocket PRIVATE ZLIB::ZLIB)
 
 add_library(lad_lib STATIC
     src/CommandIO.cpp

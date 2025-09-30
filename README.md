@@ -1,24 +1,69 @@
-# Инструкция по CMake сборке проекта:
+## Инструкция по сборке проекта LAD_APP
 
-### Важно: если вы добавляете новый файл, напишите его название в add_executable снизу
+### 1. Создание и переход в каталог сборки
 
-#### Обязательно выполнить:
-    ```Bash git clone https://github.com/google/googletest```
-    Затем следовать инструкции по сборке проекта.
+```bash
+mkdir build
+cd build
+```
 
-1) Установить CMake версии 4.0.2 и выше.
-2) Создать каталог ./build
-3) Перейти в каталог ./build
-4) Выполнить команду ```Bash cmake ..```
-5) После удачного завершения выполнить ```Bash cmake --build . --config Release --target LAD_APP``` 
+### 2. Генерация файлов сборки
 
-После этого в каталоге ./buld/Release появится готовый к запуску LAD_APP.exe
+```bash
+cmake .. -DCMAKE_BUILD_TYPE=Release
+```
 
-### Запуск тестов!
-Чтобы пересобрать тесты, следует выполнить ```Bash cmake --build . --config Release --target TEST_APP```
+> Здесь `-DCMAKE_BUILD_TYPE=Release` задаёт тип сборки. Для отладочной сборки используйте `Debug`.
 
-1) Запуск тестов с отчётностью ```Bash {путь к файлу} --gtest_output=json:report.json```
+### 3. Сборка проекта
 
-2) Запуск тестов без отчётности ```Bash {путь к файлу}```
+```bash
+cmake --build . --target LAD_APP
+```
 
-3) Или можно выполнить ```Bash ctest --C Debug --output-on-failure```
+* После сборки исполняемый файл `LAD_APP` появится в `./build/Release` (Windows) или `./build` (Linux/macOS).
+
+---
+
+## 4. Сборка и запуск тестов (опционально)
+
+1. Переключите опцию сборки тестов при необходимости:
+
+```bash
+cmake .. -DBUILD_TESTS=ON
+```
+
+2. Сборка тестов:
+
+```bash
+cmake --build . --target TEST_APP
+```
+
+3. Запуск тестов:
+
+* С отчётом в формате JSON:
+
+```bash
+./TEST_APP --gtest_output=json:report.json
+```
+
+* Без отчёта:
+
+```bash
+./TEST_APP
+```
+
+* Через `ctest` (подходит для CI):
+
+```bash
+ctest --output-on-failure
+```
+
+---
+
+## 7. Добавление новых файлов
+
+* Любые новые `.cpp` или `.h` файлы необходимо:
+
+  1. Добавить в `add_library(lad_lib ...)` или `add_executable(...)`.
+  2. Убедиться, что заголовочные файлы добавлены в `target_include_directories`.

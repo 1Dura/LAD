@@ -3,6 +3,32 @@ project(LAD_APP)
 
 option(BUILD_TESTS "Build tests" ON)
 
+### Здесь загрузка библиотек с гита, трогать не рекомендую ###
+include(FetchContent)
+FetchContent_Declare(
+    zlib
+    GIT_REPOSITORY "https://github.com/madler/zlib.git"
+    GIT_TAG v1.3
+)
+FetchContent_MakeAvailable(zlib)
+
+set(ZLIB_INCLUDE_DIR ${zlib_SOURCE_DIR}/)
+set(ZLIB_LIBRARY ZLIB::ZLIB)
+
+include(FetchContent)
+FetchContent_Declare(
+    ixwebsocket
+    GIT_REPOSITORY "https://github.com/machinezone/IXWebSocket"
+    GIT_TAG master
+)
+FetchContent_Declare(
+  nlohmann_json
+  GIT_REPOSITORY "https://github.com/nlohmann/json.git"
+  GIT_TAG v3.11.3
+)
+FetchContent_MakeAvailable(ixwebsocket nlohmann_json)
+### --------------------------------------------------------###
+
 add_library(lad_lib STATIC
     src/CommandIO.cpp
     src/Helpers.cpp
@@ -22,7 +48,10 @@ target_include_directories(lad_lib PUBLIC
 )
 
 add_executable(LAD_APP "src/LAD_AP v.2.0.0.cpp")
-target_link_libraries(LAD_APP PRIVATE lad_lib)
+target_link_libraries(LAD_APP PRIVATE
+                        lad_lib
+                        ixwebsocket
+                        nlohmann_json)
 
 if(BUILD_TESTS)
     include(FetchContent)
